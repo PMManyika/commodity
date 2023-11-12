@@ -5,10 +5,7 @@ from .models import Commodity, PriceEntry, Market
 class CommodityForm(forms.ModelForm):
     class Meta:
         model = Commodity
-        fields = [
-            "name",
-            "commodityType",
-        ]
+        fields = ["name", "commodityType", "description"]
 
 
 class PriceEntryForm(forms.ModelForm):

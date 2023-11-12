@@ -3,11 +3,17 @@ from .views import (
     add_price_entry,
     MarketCommodityListView,
     list_commodities,
+    commodity_details,
     commodity_price_entry,
 )
 
 urlpatterns = [
     path("", list_commodities, name="list-commodities"),
+    path(
+        "commodity-details/<int:commodity_id>/",
+        commodity_details,
+        name="commodity_details",
+    ),
     path("add-price-entry/", add_price_entry, name="add_price_entry"),
     path(
         "market/<str:market_name>/",

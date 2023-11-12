@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.shortcuts import render, redirect
 from django.forms import modelformset_factory
 from django.views.generic.list import ListView
@@ -16,35 +18,25 @@ from .forms import PriceEntryForm, MarketFilterForm
 def list_commodities(request):
     # Initialize the form with data from the request
     form = MarketFilterForm(request.GET or None)
-    market_name = request.GET.get(
-        "market"
-    )  # Get the market ID from the query parameters
+    sort = request.GET.get("sort")
+    market_filter = request.GET.get("market")
 
-    # If the form is valid and a market has been chosen, use that. Otherwise, default to 1.
-    if form.is_valid():
-        market_name = form.cleaned_data.get("market") or 1
+    # If the form is valid and a market has been chosen, use that.
+    if form.is_valid() and market_filter:
+        market = Market.objects.filter(id=market_filter).first()
     else:
-        market_name = "Mbare Musika"
+        market = Market.objects.first()
+        market_filter = market.id  # Default to the first market's ID
 
-    # Get the market instance if it exists, otherwise default to the first market
-    market = Market.objects.filter(name=market_name).first() or Market.objects.first()
-
-    sort_by_type = request.GET.get("sort") == "type"
-    commodities = (
-        Commodity.objects.filter(priceentry__market=market).distinct()
-        if market
-        else Commodity.objects.all()
-    )
-
-    if market:
-        commodities = Commodity.objects.filter(priceentry__market=market).distinct()
-    else:
-        commodities = Commodity.objects.all()
+    # Apply the market filter and sorting
+    commodities = Commodity.objects.filter(priceentry__market=market).distinct()
+    if sort == "name":
+        commodities = commodities.order_by("name")
+    elif sort == "type":
+        commodities = commodities.order_by("commodityType__name")
 
     commodities_data = []
-
     for commodity in commodities:
-        # Get price entries for today and yesterday
         today_entries = PriceEntry.objects.filter(
             commodity=commodity, market=market, timestamp__date=date.today()
         )
@@ -92,7 +84,9 @@ def list_commodities(request):
         commodities_data.append(
             {
                 "commodity_type_name": commodity.commodityType.name,
+                "commodity_id": commodity.pk,
                 "name": commodity.name,
+                "description": commodity.description,
                 "avg_previous_price": avg_previous_price,
                 "avg_today_price": avg_today_price,
                 "highest_today_price": highest_today_price,
@@ -101,14 +95,11 @@ def list_commodities(request):
                 "percentage_change": percentage_change,
                 "avg_price": avg_price,
                 "trend_icon": trend_icon,
-                "selected_market_id": market_name,
             }
         )
 
-    # Sorting the list of dictionaries by 'commodity_type_name' or 'name'
-    if sort_by_type:
-        commodities_data.sort(key=lambda x: x["commodity_type_name"])
-    else:
+    # Sorting the list if not already sorted by query
+    if not sort:
         commodities_data.sort(key=lambda x: x["name"])
 
     # Pagination
@@ -123,10 +114,24 @@ def list_commodities(request):
     context = {
         "form": form,
         "commodities_data": page_obj,
-        "markets": markets,
+        "markets": Market.objects.all(),
+        "current_market": market_filter,  # Pass the current market ID to the template
     }
 
     return render(request, "commodity/index.html", context)
+
+
+def commodity_details(request, commodity_id):
+    # Get commodity by ID and any other related data
+    commodity = get_object_or_404(Commodity, pk=commodity_id)
+    # ... Fetch related data ...
+
+    # Render template fragment to string
+    html = render_to_string(
+        "commodity/commodity_details.html", {"commodity": commodity}
+    )
+
+    return HttpResponse(html)
 
 
 def add_price_entry(request):

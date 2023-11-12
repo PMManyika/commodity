@@ -1,0 +1,13 @@
+{% extends 'commodity/baseBlank.html' %}
+
+{% block content %}
+<div class="commodity-details">
+    <h2>{{ commodity.name }}</h2>
+    <!-- Include any other details you want to display about the commodity -->
+    <p>Type: {{ commodity.commodityType.name }}</p>
+    {% if commodity.description %}
+        <p>Description: {{ commodity.description }}</p>
+    {% endif %}
+    <!-- Add more fields as needed -->
+</div>
+{% endblock %}

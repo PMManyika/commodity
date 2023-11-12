@@ -1,6 +1,37 @@
 {% extends 'commodity/base.html' %}
 
 {% block content %}
+<style>
+    .clickable:hover {
+      cursor: pointer;
+    }
+    .commodity-details{
+        text-align: center;
+    }
+
+    .slider-container {
+        position: fixed;
+        top: 0;
+        right: -50%; /* Hide slider by default */
+        width: 50%;
+        height: 100%;
+        background: #fffffffa;
+        box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+        z-index: 9999;
+        transition: right 0.3s;
+    }
+    .slider-content {
+        padding: 20px;
+        overflow-y: auto;
+        height: 90%;
+    }
+    #close-slider {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+</style>
+    
 <div class="container mt-5">
     <!-- Add dropdown for selecting market -->
     <form method="get" class="mb-3">
@@ -22,48 +53,55 @@
         <p>Showing commodities for all markets</p>
     {% endif %}
 
-
-    
     <div class="table-responsive-custom">
         <table class="table table-hover text-center">
-        <thead>
-            <tr>
-                <th><a href="/">Commodity</a></th>
-                <th><a href="?sort=type"> Type</a></th>
-                <th>Previous Average Price</th>
-                <th>Today's Average Price</th>
-                <th>Difference Average</th>
-                <th>Highest Price Today</th>
-                <th>Lowest Price Today</th>
-                <th>Percentage Change</th>
-                <th>7-Day Average Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for commodity_data in commodities_data %}
-            <tr>
-                <td>{{ commodity_data.name }}</td>
-                <td>{{ commodity_data.commodity_type_name }}</td>
-                <td>{{ commodity_data.avg_previous_price|floatformat:2 }}</td>
-                <td>{{ commodity_data.avg_today_price|floatformat:2 }}</td>
-                <td>{{ commodity_data.difference|floatformat:2 }}</td>
-                <td>{{ commodity_data.highest_today_price|floatformat:2 }}</td>
-                <td>{{ commodity_data.lowest_today_price|floatformat:2 }}</td>
-                <td>
-                    <span class="{% if commodity_data.percentage_change > 0 %}text-success{% elif commodity_data.percentage_change < 0 %}text-danger{% endif %}">
-                        {{ commodity_data.percentage_change|floatformat:2 }}%
-                        {% if commodity_data.percentage_change > 0 %} 🔼{% elif commodity_data.percentage_change < 0 %} 🔽{% else %}{% endif %}
-                    </span>
-                </td>
-                <td>{{ commodity_data.avg_price|floatformat:2 }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="10">No price entries available.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            <thead>
+                <tr>
+                    <th><a href="?sort=name{% if request.GET.market %}&market={{ request.GET.market }}{% endif %}">Commodity</a></th>
+                    
+                    <th>
+                        <a href="?sort=type{% if request.GET.market %}&market={{ request.GET.market }}{% endif %}"> Type</a>
+                    </th>
+                    <th>Previous Average Price</th>
+                    <th>Today's Average Price</th>
+                    <th>Difference Average</th>
+                    <th>Highest Price Today</th>
+                    <th>Lowest Price Today</th>
+                    <th>Percentage Change</th>
+                    <th>7-Day Average Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for commodity_data in commodities_data %}
+                <tr class="clickable" onclick="openSlider(`{{ commodity_data.commodity_id }}`);">
+                    <td>{{ commodity_data.name }}</td>
+                    <td>{{ commodity_data.commodity_type_name }}</td>
+                    <td>{{ commodity_data.avg_previous_price|floatformat:2 }}</td>
+                    <td>{{ commodity_data.avg_today_price|floatformat:2 }}</td>
+                    <td>{{ commodity_data.difference|floatformat:2 }}</td>
+                    <td>{{ commodity_data.highest_today_price|floatformat:2 }}</td>
+                    <td>{{ commodity_data.lowest_today_price|floatformat:2 }}</td>
+                    <td>
+                        <span class="{% if commodity_data.percentage_change > 0 %}text-success{% elif commodity_data.percentage_change < 0 %}text-danger{% endif %}">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    {{ commodity_data.percentage_change|floatformat:2 }}%
+                                </div>
+                                <div>
+                                    {% if commodity_data.percentage_change > 0 %} 🔼{% elif commodity_data.percentage_change < 0 %} 🔽{% else %} ➡️ {% endif %}
+                                </div>
+                            </div>
+                        </span>
+                    </td>
+                    <td>{{ commodity_data.avg_price|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9">No price entries available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
    <!-- Bootstrap Pagination Controls -->
@@ -84,7 +122,8 @@
         
         {% for num in commodities_data.paginator.page_range %}
         <li class="page-item {% if commodities_data.number == num %}active{% endif %}">
-            <a class="page-link" href="?page={{ num }}{% if request.GET.market %}&market={{ request.GET.market }}{% endif %}">{{ num }}</a>
+            <a class="page-link" href="?page={{ num }}{% if market_filter %}&market={{ market_filter }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ num }}</a>
+
         </li>
         {% endfor %}
         
@@ -106,4 +145,27 @@
     
 
 </div>
+<div id="slider" class="slider-container">
+    <div id="slider-content" class="slider-content">
+        <!-- Content will be loaded here dynamically -->
+    </div>
+    <button id="close-slider" class="btn btn-danger">&times; Close</button>
+</div>
+<script>
+
+    function openSlider(commodityId) {
+        fetch(`/commodity-details/${commodityId}`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('slider-content').innerHTML = html;
+                document.getElementById('slider').style.right = '0';
+            });
+    }
+
+    document.getElementById('close-slider').addEventListener('click', function() {
+        document.getElementById('slider').style.right = '-50%';
+    });
+
+    </script>
+    
 {% endblock %}
