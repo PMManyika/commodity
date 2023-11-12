@@ -1,0 +1,25 @@
+{% extends 'commodity/base.html' %}
+
+{% block content %}
+<div class="container mt-3">
+    <h2 class="mb-4">Commodities in {{ market.name }}</h2>
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Commodity Name</th>
+                <th scope="col">Latest Price</th>
+                <!-- Add more headers as needed -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for commodity in commodities %}
+            <tr>
+                <td>{{ commodity.name }}</td>
+                <td>{{ commodity.latest_price }}</td>
+                <!-- Add more commodity details as needed -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

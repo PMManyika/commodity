@@ -1,0 +1,68 @@
+{% extends 'commodity/base.html' %}
+{% load static %} <!-- If you have static files like custom JS or CSS -->
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-3">
+    <h2>Enter Commodity Prices</h2>
+    <form method="post" id="priceEntryForm">
+        {% csrf_token %}
+        {{ formset.management_form }}  
+
+        <div id="form-set">
+            {% for form in formset %}
+            <div class="form-copy">
+                {% for field in form.visible_fields %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {% render_field field class+="form-control" %}
+                    {% if field.errors %}
+                        <div class="invalid-feedback">
+                            {{ field.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" class="btn btn-success" id="add-more"> [+] Commodity</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#add-more').click(function() {
+        var totalForms = $('#id_form-TOTAL_FORMS').val();
+        var formCopy = $('.form-copy:first').clone();
+
+        // Clear the values of the inputs in the cloned form
+        formCopy.find(':input:not([type=button],[type=submit],[type=reset])').each(function() {
+            var name = $(this).attr('name').replace('-0', '-' + totalForms);
+            var id = 'id_' + name;
+            $(this).attr({'name': name, 'id': id}).val('').prop('checked', false);
+        });
+
+        // Update the labels to correspond to the new form fields
+        formCopy.find('label').each(function() {
+            var newFor = $(this).attr('for').replace('-0', '-' + totalForms);
+            $(this).attr('for', newFor);
+        });
+
+        // Insert the cloned form at the end of the form set
+        $('#form-set').append(formCopy);
+
+        // Increment the total number of forms in the formset
+        $('#id_form-TOTAL_FORMS').val(parseInt(totalForms) + 1);
+
+        // Optional: Scroll to the new form
+        $('html, body').animate({
+            scrollTop: $(formCopy).offset().top
+        }, 1000);
+    });
+});
+
+</script>
+{% endblock %}

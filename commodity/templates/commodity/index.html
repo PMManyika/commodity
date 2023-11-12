@@ -1,0 +1,109 @@
+{% extends 'commodity/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Add dropdown for selecting market -->
+    <form method="get" class="mb-3">
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <select name="market" id="market" class="form-control" onchange="this.form.submit()">
+                    {% for market in markets %}
+                    <option value="{{ market.id }}" {% if request.GET.market == market.id|stringformat:"s" %}selected{% endif %}>{{ market.name }}</option>
+                    {% endfor %}
+                </select> 
+            </div>
+        </div>
+    </form>
+
+    <!-- Display current filter -->
+    {% if request.GET.market %}
+        <p>Showing commodities for market: <strong>{{ request.GET.market }}</strong></p>
+    {% else %}
+        <p>Showing commodities for all markets</p>
+    {% endif %}
+
+
+    
+    <div class="table-responsive-custom">
+        <table class="table table-hover text-center">
+        <thead>
+            <tr>
+                <th><a href="/">Commodity</a></th>
+                <th><a href="?sort=type"> Type</a></th>
+                <th>Previous Average Price</th>
+                <th>Today's Average Price</th>
+                <th>Difference Average</th>
+                <th>Highest Price Today</th>
+                <th>Lowest Price Today</th>
+                <th>Percentage Change</th>
+                <th>7-Day Average Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for commodity_data in commodities_data %}
+            <tr>
+                <td>{{ commodity_data.name }}</td>
+                <td>{{ commodity_data.commodity_type_name }}</td>
+                <td>{{ commodity_data.avg_previous_price|floatformat:2 }}</td>
+                <td>{{ commodity_data.avg_today_price|floatformat:2 }}</td>
+                <td>{{ commodity_data.difference|floatformat:2 }}</td>
+                <td>{{ commodity_data.highest_today_price|floatformat:2 }}</td>
+                <td>{{ commodity_data.lowest_today_price|floatformat:2 }}</td>
+                <td>
+                    <span class="{% if commodity_data.percentage_change > 0 %}text-success{% elif commodity_data.percentage_change < 0 %}text-danger{% endif %}">
+                        {{ commodity_data.percentage_change|floatformat:2 }}%
+                        {% if commodity_data.percentage_change > 0 %} 🔼{% elif commodity_data.percentage_change < 0 %} 🔽{% else %}{% endif %}
+                    </span>
+                </td>
+                <td>{{ commodity_data.avg_price|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="10">No price entries available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+   <!-- Bootstrap Pagination Controls -->
+<nav aria-label="Commodity pagination">
+    <ul class="pagination justify-content-center">
+        {% if commodities_data.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1{% if request.GET.market %}&market={{ request.GET.market }}{% endif %}" aria-label="First">
+                <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ commodities_data.previous_page_number }}{% if request.GET.market %}&market={{ request.GET.market }}{% endif %}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% endif %}
+        
+        {% for num in commodities_data.paginator.page_range %}
+        <li class="page-item {% if commodities_data.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}{% if request.GET.market %}&market={{ request.GET.market }}{% endif %}">{{ num }}</a>
+        </li>
+        {% endfor %}
+        
+        {% if commodities_data.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ commodities_data.next_page_number }}{% if request.GET.market %}&market={{ request.GET.market }}{% endif %}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ commodities_data.paginator.num_pages }}{% if request.GET.market %}&market={{ request.GET.market }}{% endif %}" aria-label="Last">
+                <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+
+    
+
+</div>
+{% endblock %}

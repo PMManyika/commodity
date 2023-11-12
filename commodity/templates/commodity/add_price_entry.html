@@ -1,0 +1,43 @@
+{% extends 'commodity/base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Add Price Entry</h1>
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="form-group">
+            {{ form.commodity.label_tag }}
+            {{ form.commodity|add_class:"form-control" }}
+            {% if form.commodity.errors %}
+                <div class="invalid-feedback">
+                    {{ form.commodity.errors|join:", " }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form.price.label_tag }}
+            {{ form.price|add_class:"form-control" }}
+            {% if form.price.errors %}
+                <div class="invalid-feedback">
+                    {{ form.price.errors|join:", " }}
+                </div>
+            {% endif %}
+        </div>
+
+
+        <div class="form-group">
+            {{ form.market.label_tag }}
+            {{ form.market|add_class:"form-control" }}
+            {% if form.market.errors %}
+                <div class="invalid-feedback">
+                    {{ form.market.errors|join:", " }}
+                </div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

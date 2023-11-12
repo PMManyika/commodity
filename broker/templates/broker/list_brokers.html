@@ -1,0 +1,104 @@
+{% extends "commodity/base.html" %}
+
+{% block content %}
+<div>
+    <h1>Commodity Brokers</h1>
+    <div class="pagination">
+        <span class="step-links">
+          {% if brokers.has_previous %}
+              <a href="?page=1">&laquo; first</a>
+              <a href="?page={{ brokers.previous_page_number }}">previous</a>
+          {% endif %}
+          
+          <span class="current">
+              Page {{ brokers.number }} of {{ brokers.paginator.num_pages }}.
+          </span>
+          
+          {% if brokers.has_next %}
+              <a href="?page={{ brokers.next_page_number }}">next</a>
+              <a href="?page={{ brokers.paginator.num_pages }}">last &raquo;</a>
+          {% endif %}
+        </span>
+      </div>
+      
+
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Country</th>
+                <th>Website</th>
+                <th>Rating</th>
+                <th>Verified</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for broker in brokers %}
+            <tr>
+                <td><a href="broker_detail/{{broker.id}}">{{ broker.name }}</a></td>
+                <td>{{ broker.country }}</td>
+                <td><a href="{{ broker.website }}" target="_blank">{{ broker.website }}</a></td>
+                <td>{{ broker.rating }}</td>
+                <td>{{ broker.is_verified|yesno:"Yes,No" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination controls -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          {% if brokers.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1" aria-label="First">
+                <span aria-hidden="true">&laquo;&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ brokers.previous_page_number }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">&laquo;&laquo;</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">&laquo;</span>
+            </li>
+          {% endif %}
+          
+          <!-- Show page numbers -->
+          {% for num in brokers.paginator.page_range %}
+            {% if brokers.number == num %}
+              <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ num }}</span>
+              </li>
+            {% elif num > brokers.number|add:'-3' and num < brokers.number|add:'3' %}
+              <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+          {% endfor %}
+      
+          {% if brokers.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ brokers.next_page_number }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ brokers.paginator.num_pages }}" aria-label="Last">
+                <span aria-hidden="true">&raquo;&raquo;</span>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">&raquo;</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">&raquo;&raquo;</span>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+</div>
+{% endblock %}
