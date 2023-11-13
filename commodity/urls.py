@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    Logout,
     add_price_entry,
     MarketCommodityListView,
     list_commodities,
@@ -21,4 +22,5 @@ urlpatterns = [
         name="market_commodity_list",
     ),
     path("commodity/price-entry/", commodity_price_entry, name="commodity-price-entry"),
+    path("logout/", Logout, name="logout"),
 ]

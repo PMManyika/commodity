@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
 from django.shortcuts import render, redirect
 from django.forms import modelformset_factory
@@ -193,3 +194,8 @@ def commodity_price_entry(request):
     return render(
         request, "commodity/multiple_price_entries.html", {"formset": formset}
     )
+
+
+def Logout(request):
+    logout(request)
+    return redirect("/")
