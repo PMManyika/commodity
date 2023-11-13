@@ -2,27 +2,9 @@
 
 {% block content %}
 <div>
-    <h1>Commodity Brokers</h1>
-    <div class="pagination">
-        <span class="step-links">
-          {% if brokers.has_previous %}
-              <a href="?page=1">&laquo; first</a>
-              <a href="?page={{ brokers.previous_page_number }}">previous</a>
-          {% endif %}
-          
-          <span class="current">
-              Page {{ brokers.number }} of {{ brokers.paginator.num_pages }}.
-          </span>
-          
-          {% if brokers.has_next %}
-              <a href="?page={{ brokers.next_page_number }}">next</a>
-              <a href="?page={{ brokers.paginator.num_pages }}">last &raquo;</a>
-          {% endif %}
-        </span>
-      </div>
-      
-
-    <table class="table table-striped mt-4">
+  {% if brokers %}
+    <h2>Commodity Brokers</h2>
+    <table class="table table-striped mt-4" style="text-align: left;">
         <thead>
             <tr>
                 <th>Name</th>
@@ -100,5 +82,6 @@
           {% endif %}
         </ul>
       </nav>
+      {% endif %}
 </div>
 {% endblock %}

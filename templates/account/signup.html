@@ -1,0 +1,41 @@
+{% extends "blankBase.html" %} 
+{% load i18n %}
+{% load static %}
+{% load widget_tweaks %}
+{% block head_title %}
+    {% trans "Signup" %}
+{% endblock head_title %}
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="col-md-4">
+        <h1 class="mb-3 text-center">{% trans "Sign Up" %}</h1>
+        <p class="text-center">
+            {% trans "Already have an account?" %} 
+            <a href="{% url 'account_login' %}">{% trans "sign in" %}</a>.
+        </p>
+        <form method="post" action="{% url 'account_signup' %}" class="needs-validation" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field|add_class:"form-control" }}
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">{% trans "Sign Up" %}</button>
+            </div>
+        </form>
+        <div class="mt-4">
+            {% include "socialaccount/snippets/provider_list.html" %}
+        </div>
+    </div>
+    </div>
+{% endblock content %}

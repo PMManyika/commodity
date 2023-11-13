@@ -11,6 +11,8 @@ from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
 
+from broker.models import Broker
+
 from .models import Commodity, PriceEntry, Market
 from .forms import PriceEntryForm, MarketFilterForm
 
@@ -125,10 +127,26 @@ def commodity_details(request, commodity_id):
     # Get commodity by ID and any other related data
     commodity = get_object_or_404(Commodity, pk=commodity_id)
     # ... Fetch related data ...
+    brokers_list = Broker.objects.all()
+    # Set the number of brokers per page
+    paginator = Paginator(brokers_list, 10)  # Show 10 brokers per page
+
+    # Get the page number from the query parameters
+    # If page parameter is not available, default to 1
+    page = request.GET.get("page", 1)
+
+    try:
+        brokers = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        brokers = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        brokers = paginator.page(paginator.num_pages)
 
     # Render template fragment to string
     html = render_to_string(
-        "commodity/commodity_details.html", {"commodity": commodity}
+        "commodity/commodity_details.html", {"commodity": commodity, "brokers": brokers}
     )
 
     return HttpResponse(html)

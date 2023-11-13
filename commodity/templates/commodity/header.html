@@ -29,7 +29,12 @@
                 <a href="{% url 'commodity-price-entry' %}" class="text-white mr-3">ADD PRODUCTS</a>
                 <a href="#" class="text-white mr-3">SUPPORT</a>
             </div>
-            <a href="#" class="btn btn-light ml-2">Login</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'account_logout' %}" class="btn btn-light ml-2">Logout</a>
+            {% else %}
+            <a href="{% url 'account_login' %}" class="btn btn-light ml-2">Login</a>
+            {% endif %}
+
         </div>
     </div>
 </div>

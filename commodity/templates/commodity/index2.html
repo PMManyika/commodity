@@ -8,7 +8,28 @@
     .commodity-details{
         text-align: center;
     }
-    
+
+    .slider-container {
+        position: fixed;
+        top: 0;
+        right: -50%; /* Hide slider by default */
+        width: 50%;
+        height: 100%;
+        background: #fffffffa;
+        box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+        z-index: 9999;
+        transition: right 0.3s;
+    }
+    .slider-content {
+        padding: 20px;
+        overflow-y: auto;
+        height: 90%;
+    }
+    #close-slider {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
 </style>
     
 <div class="container mt-5">
@@ -38,7 +59,7 @@
         <table class="table table-hover text-center">
             <thead>
                 <tr>
-                    <th style="width: 13%; text-align: left;"><a href="?sort=name{% if request.GET.market %}&market={{ request.GET.market }}{% endif %}">Commodity</a></th>
+                    <th><a href="?sort=name{% if request.GET.market %}&market={{ request.GET.market }}{% endif %}">Commodity</a></th>
                     
                     <th>
                         <a href="?sort=type{% if request.GET.market %}&market={{ request.GET.market }}{% endif %}"> Type</a>
@@ -54,8 +75,8 @@
             </thead>
             <tbody>
                 {% for commodity_data in commodities_data %}
-                <tr class="clickable" data-toggle="collapse" data-target="#details-{{ forloop.counter }}" aria-expanded="false" aria-controls="details-{{ forloop.counter }}">
-                    <td style="text-align: left;">{{ commodity_data.name }}</td>
+                <tr class="clickable" onclick="openSlider(`{{ commodity_data.commodity_id }}`);">
+                    <td>{{ commodity_data.name }}</td>
                     <td>{{ commodity_data.commodity_type_name }}</td>
                     <td>{{ commodity_data.avg_previous_price|floatformat:2 }}</td>
                     <td>{{ commodity_data.avg_today_price|floatformat:2 }}</td>
@@ -75,16 +96,6 @@
                         </span>
                     </td>
                     <td>{{ commodity_data.avg_price|floatformat:2 }}</td>
-                </tr>
-                <tr id="details-{{ forloop.counter }}" class="collapse">
-                    <td colspan="9">
-                        <!-- Here you can add any details such as a nested table or just text -->
-                        <div class="commodity-details">
-                            {% if commodity_data.description %}
-                                <p>{{ commodity_data.description}}</p>
-                            {% endif %}
-                        </div>
-                    </td>
                 </tr>
                 {% empty %}
                 <tr>
@@ -136,17 +147,14 @@
     
 
 </div>
+<div id="slider" class="slider-container">
+    <div id="slider-content" class="slider-content">
+        <!-- Content will be loaded here dynamically -->
+    </div>
+    <button id="close-slider" class="btn btn-danger">&times; Close</button>
+</div>
 <script>
-    $(document).ready(function() {
-      $('.clickable').click(function() {
-        var target = $(this).data('target');
-        $(target).collapse('toggle');
-      });
-    });
-
     function openSlider(commodityId) {
-        // Fetch commodity details from the server
-        // For demonstration purposes, let's assume the endpoint is '/commodity-details/'
         fetch(`/commodity-details/${commodityId}`)
             .then(response => response.text())
             .then(html => {
@@ -159,6 +167,15 @@
         document.getElementById('slider').style.right = '-50%';
     });
 
-    </script>
+    // Close the slider if clicked outside
+    window.addEventListener('click', function(event) {
+        var slider = document.getElementById('slider');
+        // Use contains to check if the clicked area is not the slider or a child of the slider
+        if (!slider.contains(event.target)) {
+            slider.style.right = '-50%';
+        }
+    });
+</script>
+
     
 {% endblock %}
