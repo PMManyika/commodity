@@ -81,9 +81,10 @@ text-decoration: none !important;
   text-decoration: none !important;
   }
 
-.logo {
-background-color: #ffffff;
+.logo p {
+background-color: #ffffff75;
 padding: 5px;
+line-height: 0.7;
 }
 
 .header_background {
@@ -123,13 +124,19 @@ display: flex;
 justify-content: space-between;
 flex-wrap: wrap;
 }
+.subscription {
+flex: 6;
+margin-bottom: 20px;
+
+}
 
 .useful-pages {
-flex: 9;
+flex: 4;
 margin-bottom: 20px;
+
 }
 .about-us {
-    flex: 3;
+    flex: 4;
     margin-bottom: 20px;
     font-weight: lighter !important;
     }
@@ -157,30 +164,22 @@ font-size: 0.9em;
 line-height: 1.5;
 }
 
-a table {
+a, table {
 color: #000;
 text-decoration: none;
 }
-
-
-
-
-        </style> 
+</style> 
        
     </head>
     <body>
-        
         {% include 'commodity/header.html' %}
-        <!-- <div class="banner">
-            <div class="banner-content">
-                <div class="banner-title">DAILY PRICES</div>
-                <div class="banner-description">We track and update daily prices for most popular Agricultural Goods like Corn, Wheat, Soybeans, and more. Explore agricultural commodity prices with us!</div>
-                <a href="{% url 'add_price_entry' %}" class="banner-button">Commodity Daily Prices
-                </a>
-            </div>
-        </div> -->
-        
-        <div class="container mt-5" style="padding-bottom: 20px;">
+        <div class="breadcrumbs">
+            {% load breadcrumbs_tags %}
+            {% render_breadcrumbs %}
+
+        </div>
+
+        <div class="container mt-5" style="padding-bottom: 20px; min-height: 60vh;">
         {% block content %}{% endblock %}
         </div>
 

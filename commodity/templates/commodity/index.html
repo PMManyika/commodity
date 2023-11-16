@@ -18,6 +18,7 @@
             <form method="get" class="mb-3">
                 <div class="form-group">
                     <select name="market" id="market" class="form-control" onchange="this.form.submit()">
+                        <option value="">Select Market</option>
                         {% for market in markets %}
                         <option value="{{ market.id }}" {% if request.GET.market == market.id|stringformat:"s" %}selected{% endif %}>{{ market.name }}</option>
                         {% endfor %}
@@ -31,7 +32,7 @@
     {% if request.GET.market %}
         <p>Showing commodities for market: <strong>{{ request.GET.market }}</strong></p>
     {% else %}
-        <p>Showing commodities for all markets</p>
+        <p>Showing commodities for Mbare Musika market</p>
     {% endif %}
 
     <div class="table-responsive-custom">
@@ -44,12 +45,12 @@
                         <a href="?sort=type{% if request.GET.market %}&market={{ request.GET.market }}{% endif %}"> Type</a>
                     </th>
                     <th>Previous Average Price</th>
-                    <th>Today's Average Price</th>
+                    <th style="width: 12%;">Today's Average Price</th>
                     <th>Difference Average</th>
                     <th>Highest Price Today</th>
                     <th>Lowest Price Today</th>
                     <th>Percentage Change</th>
-                    <th>7-Day Average Price</th>
+                    <th style="width: 12%;">7-Day Average Price</th>
                 </tr>
             </thead>
             <tbody>
@@ -95,6 +96,7 @@
         </table>
     </div>
 
+    {% if user.is_authenticated %}
    <!-- Bootstrap Pagination Controls -->
 <nav aria-label="Commodity pagination">
     <ul class="pagination justify-content-center">
@@ -132,7 +134,9 @@
         {% endif %}
     </ul>
 </nav>
-
+{% else %}
+<p class="text-center"><a href="{% url 'account_login' %}" style="color: #000; text-decoration: none;">Login</a> account to view more commodity prices...</p>
+{% endif %}
     
 
 </div>

@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "broker",
     "commodity",
+    "bids",
+    "libs",
+    "utils",
     "widget_tweaks",
     "allauth",
     "allauth.account",
@@ -79,6 +82,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "utils.breadcrumbs.breadcrumbs",
             ],
         },
     },
@@ -154,3 +158,4 @@ MEDIA_URL = "/img/"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+X_FRAME_OPTIONS = "ALLOWALL"

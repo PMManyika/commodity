@@ -1,0 +1,101 @@
+{% extends "commodity/base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+            <div class="col-sm-12 col-md-8">
+                
+                <div class="d-flex border">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr class="text-center">
+                                    <th width="40%">Bid Time Left</th>
+                                    <th>Place your bid</th>
+                                    <th width="20%">Current Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    <tr class="text-center">
+                                        <td><h5 class="font-weight-bold"><span id="countdown"></span></h5></td>
+                                        <td>
+                                            <form method="post" action="{% url 'place_bid' commodity.id %}">
+                                                {% csrf_token %}
+                                                <div class="d-flex">
+                                                    <input type="text" class="form-control" style="border-radius: 5px 0 0 5px;" placeholder="Amount" id="bid_amount" name="bid_amount" required>
+                                                
+                                                    <button type="submit" class="btn btn-danger" style="border-radius: 0 5px 5px 0;">Bid</button>
+                                                </div>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            ${{ commodity.current_price }}
+                                        </td>
+                                    </tr>
+                            </tbody>
+                        </table>
+                    </div>
+            </div>
+                <!-- Commodity Details -->
+                <div class="border rounded p-3 mt-3">
+                    <h3>{{ commodity.name }}</h3>
+                    <p>{{ commodity.description }}</p>
+                </div>
+            
+                
+            </div>
+            
+        <div class="col-sm-12 col-md-4 ">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Bid Amount</th>
+                            <th>Bid Time</th>
+                            <th>Total Bids: {{ bid_count }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bid in bids %}
+                            <tr>
+                                <td>${{ bid.bid_amount }}</td>
+                                <td colspan="2">{{ bid.bid_time|date:"F d, Y H:i:s" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to update the countdown timer
+    function updateCountdown(endTime) {
+        const now = new Date().getTime();
+        const timeLeft = endTime - now;
+
+        if (timeLeft <= 0) {
+            // Auction has expired, display a message or take action accordingly
+            document.getElementById("countdown").innerHTML = "Auction has ended";
+        } else {
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            // Display the countdown
+            document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+    }
+
+    // Replace 'bidding_session.end_time' with the actual end time in milliseconds (Unix timestamp)
+    const expiryTime = new Date('{{  bidding_session|date:"F d, Y H:i:s" }}000').getTime();
+
+    // Update the countdown every second
+    setInterval(function () {
+        updateCountdown(expiryTime);
+    }, 1000);
+</script>
+
+{% endblock %}

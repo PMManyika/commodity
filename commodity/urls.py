@@ -6,10 +6,11 @@ from .views import (
     list_commodities,
     commodity_details,
     commodity_price_entry,
+    packages,
 )
 
 urlpatterns = [
-    path("", list_commodities, name="list-commodities"),
+    path("", list_commodities, name="list_commodities"),
     path(
         "commodity-details/<int:commodity_id>/",
         commodity_details,
@@ -22,5 +23,6 @@ urlpatterns = [
         name="market_commodity_list",
     ),
     path("commodity/price-entry/", commodity_price_entry, name="commodity-price-entry"),
+    path("packages/", packages, name="packages"),
     path("logout/", Logout, name="logout"),
 ]

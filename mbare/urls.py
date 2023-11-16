@@ -26,6 +26,8 @@ urlpatterns = [
     path("broker/", include("broker.urls")),
     path("accounts/", include("allauth.urls")),
     path("accounts/profile/", list_commodities, name="list-commodities"),
+    path("bidding/", include("bids.urls")),
+    path("libs/", include("libs.urls")),
 ]
 
 if settings.DEBUG:

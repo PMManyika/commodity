@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.forms import modelformset_factory
 from django.views.generic.list import ListView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
 from django.db.models import Avg, Max, Min
 from django.shortcuts import render, redirect
@@ -194,6 +195,10 @@ def commodity_price_entry(request):
     return render(
         request, "commodity/multiple_price_entries.html", {"formset": formset}
     )
+
+
+def packages(request):
+    return render(request, "commodity/packages.html")
 
 
 def Logout(request):

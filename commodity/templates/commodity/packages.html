@@ -1,0 +1,45 @@
+{% extends 'commodity/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container d-flex flex-column justify-content-center" style="height: 550px;">
+    <h2 class="text-center mb-4">Membership Access Packages</h2>
+    <div class="row">
+        <!-- Package 1 -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Basic</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">$9.99</h6>
+                    <p class="card-text">Basic Analytics, <br />Email Support</p>
+                    <a href="#" class="btn btn-info">Get Started</a>
+                </div>
+            </div>
+        </div>
+        <!-- Package 2 -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Enterprise</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">$99.99/mo</h6>
+                    <p class="card-text">Full Analytics Suite, <br />Priority Support</p>
+                    <p class="card-text">Custom Integrations</p>
+                    <a href="#" class="btn btn-warning">Get Started</a>
+                </div>
+            </div>
+        </div>
+        <!-- Package 3 -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Premium</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">$29.99/mo</h6>
+                    <p class="card-text">Advanced Analytics, <br />Priority Support, API Access</p>
+                    <a href="#" class="btn btn-info">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
