@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from broker.models import Broker
 
 
 class Commodity(models.Model):
@@ -8,10 +9,22 @@ class Commodity(models.Model):
     starting_price = models.DecimalField(max_digits=10, decimal_places=2)
     current_price = models.DecimalField(max_digits=10, decimal_places=2)
     end_time = models.DateTimeField()
+    broker = models.ForeignKey(Broker, on_delete=models.CASCADE)
     time_stamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name}"
+
+
+class CommodityImage(models.Model):
+    commodity = models.ForeignKey(
+        Commodity, on_delete=models.CASCADE, related_name="images"
+    )
+    image = models.ImageField(upload_to="commodity_images/")
+    broker = models.ForeignKey(Broker, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Image for {self.commodity.name}"
 
 
 class Bid(models.Model):

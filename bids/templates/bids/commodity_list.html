@@ -10,19 +10,32 @@
           <th>Commodity</th>
           <th>Posted</th>
           <th>Countdown</th> <!-- New column for the countdown timer -->
+          <th>Image</th>
         </tr>
       </thead>
       <tbody>
         {% for commodity in page %}
         <tr>
-          <td class="col-md-7"><a href="{% url 'commodity_detail' commodity.id %}" style="color: #000; text-decoration: none;">{{ commodity.name }}</a></td>
-          <td>{{ commodity.time_stamp }}</td>
-          <td style="font-weight: bold;">
-            <span id="countdown_{{ commodity.id }}"></span>
-          </td>
+            <td class="col-md-6" style="vertical-align: middle;">
+                <a href="{% url 'commodity_detail' commodity.id %}" style="color: #000; text-decoration: none;">{{ commodity.name }}</a>
+            </td>
+            <td style="vertical-align: middle;">{{ commodity.time_stamp }}</td>
+            <td style="font-weight: bold; vertical-align: middle;">
+                <span id="countdown_{{ commodity.id }}"></span>
+            </td>
+            <td style="vertical-align: middle;">
+                {% with commodity.images.first as first_image %}  <!-- Get the first image associated with the commodity -->
+                    {% if first_image %}
+                        <img src="{{ first_image.image.url }}" alt="{{ commodity.name }}" height="30px" width="30px">  <!-- Display the first image with a width of 50px -->
+                    {% else %}
+                    <div style="height: 30px;"></div>    
+                    {% endif %}
+                {% endwith %}
+            </td>
         </tr>
         {% endfor %}
-      </tbody>
+    </tbody>
+    
     </table>
     {% else %}
     <p>There are currently no commodities.</p>

@@ -39,6 +39,7 @@ class CommodityBroker(models.Model):
 
 
 class Broker(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     # Basic Information
     name = models.CharField(max_length=255)
     country = models.CharField(max_length=255)

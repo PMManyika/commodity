@@ -1,10 +1,10 @@
 from django.contrib import admin
-from .models import Commodity, Bid, BiddingSession
+from .models import Commodity, Bid, BiddingSession, CommodityImage
 
 
 @admin.register(Commodity)
 class CommodityAdmin(admin.ModelAdmin):
-    list_display = ("name", "current_price", "end_time")
+    list_display = ("name", "broker", "current_price", "end_time")
     list_filter = ("end_time",)
     search_fields = ("name", "description")
 
@@ -20,4 +20,11 @@ class BidAdmin(admin.ModelAdmin):
 class BiddingSessionAdmin(admin.ModelAdmin):
     list_display = ("commodity", "start_time", "end_time")
     list_filter = ("end_time",)
+    search_fields = ("commodity__name",)
+
+
+@admin.register(CommodityImage)
+class CommodityImageAdmin(admin.ModelAdmin):
+    list_display = ("commodity", "image", "broker")
+    list_filter = ("commodity__name",)
     search_fields = ("commodity__name",)

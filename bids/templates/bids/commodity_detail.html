@@ -1,101 +1,193 @@
 {% extends "commodity/base.html" %}
 
 {% block content %}
-<div class="container">
+
     <div class="row">
-            <div class="col-sm-12 col-md-8">
-                
-                <div class="d-flex border">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr class="text-center">
-                                    <th width="40%">Bid Time Left</th>
-                                    <th>Place your bid</th>
-                                    <th width="20%">Current Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                    <tr class="text-center">
-                                        <td><h5 class="font-weight-bold"><span id="countdown"></span></h5></td>
-                                        <td>
-                                            <form method="post" action="{% url 'place_bid' commodity.id %}">
-                                                {% csrf_token %}
-                                                <div class="d-flex">
-                                                    <input type="text" class="form-control" style="border-radius: 5px 0 0 5px;" placeholder="Amount" id="bid_amount" name="bid_amount" required>
-                                                
-                                                    <button type="submit" class="btn btn-danger" style="border-radius: 0 5px 5px 0;">Bid</button>
-                                                </div>
-                                            </form>
-                                        </td>
-                                        <td>
-                                            ${{ commodity.current_price }}
-                                        </td>
-                                    </tr>
-                            </tbody>
-                        </table>
-                    </div>
-            </div>
-                <!-- Commodity Details -->
-                <div class="border rounded p-3 mt-3">
-                    <h3>{{ commodity.name }}</h3>
-                    <p>{{ commodity.description }}</p>
+        <div class="col-sm-12 col-md-9" style="padding-left: 0;">
+            <div class="d-flex">
+                <div class="text-center mt-3">
+                    {% for image in commodity.images.all %}
+                        {% if forloop.counter <= 3 %}
+                            <div class="col-12 mb-2">
+                                <img
+                                    src="{{ image.image.url }}"
+                                    alt="{{ commodity.name }}"
+                                    width="80px"
+                                    class="small-image"
+                                    data-large-image-url="{{ image.image.url }}"
+                                >
+                            </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
-            
-                
+                <div class="text-center mt-3">
+                    {% with commodity.images.first as first_image %}
+                        {% if first_image %}
+                            <div class=" mb-3">
+                                <img src="{{ first_image.image.url }}" alt="{{ commodity.name }}" width="400px" id="large-image">
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                <div class="col-5">
+                    <div>
+                        <div class="pt-3">
+                            <h2>{{ commodity.name }}</h2>
+                            <p>
+                                <div style="font-weight:bold; font-size: large;">${{ commodity.current_price }}</div>
+                                <br />
+                                Total Bids: {{ bid_count }}
+                            </p>
+                        <div>
+                            <h6>Bid Time Left</h6>
+                        </div>
+                        <div id="countdown p-0 pb-3">
+                            <div id="days" class="countdown-item">0d</div>
+                            <div id="hours" class="countdown-item">0h</div>
+                            <div id="minutes" class="countdown-item">0m</div>
+                            <div id="seconds" class="countdown-item">0s</div>
+                        </div>
+
+                        </div>
+
+                        {% if not winning_bid %}
+                        <button class="btn btn-info mt-2" data-toggle="modal" data-target="#placeBidModal">Place Bid</button>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            
-        <div class="col-sm-12 col-md-4 ">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Bid Amount</th>
-                            <th>Bid Time</th>
-                            <th>Total Bids: {{ bid_count }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for bid in bids %}
-                            <tr>
-                                <td>${{ bid.bid_amount }}</td>
-                                <td colspan="2">{{ bid.bid_time|date:"F d, Y H:i:s" }}</td>
-                            </tr>
+            <div style="margin-top: 40px;">
+                <hr>
+                <!-- Display related products -->
+                {% if related_products %}
+                <div class="rounded p-3 mt-3">
+                    <h5>Other Products from the Same Broker</h5>
+                    <div class="row">
+                        {% for related_product in related_products %}
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <div class="card-body">
+                                    {% if related_product.images.first %}
+                                    <a href="{% url 'commodity_detail' related_product.id %}">
+                                    <img src="{{ related_product.images.first.image.url }}" alt="{{ related_product.name }}" class="card-img-top"></a>
+                                    {% endif %}
+                                    <h6 class="card-title pt-3"><a href="{% url 'commodity_detail' related_product.id %}">{{ related_product.description }}</a></h6>
+                                    <p class="card-text">${{ related_product.current_price }}</p>
+                                </div>
+                            </div>
+                        </div>
                         {% endfor %}
-                    </tbody>
-                </table>
+                    </div>
+                </div>
+                {% endif %}
+                <hr>
             </div>
+            <!-- Commodity Details -->
+            <div class="rounded p-3 mt-3">
+                <p style="font-size: 20px; font-weight: bold;">Description</p>
+                {% if commodity.description %}
+                    <p>{{ commodity.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-md-3">
+            <div class="border p-3 border-radius">
+                <p style="font-weight: bold;">Seller information</p>
+                <p>Contact seller
+                    <br>
+                    Visit store
+                </p>
+                <p></p>
+            </div>
+
+            {% if winning_bid %}
+                <div class="alert alert-success mt-3">
+                    <h5 class="alert-heading">Winning Bid Information</h5>
+                    <p>Winning Bid Amount: ${{ winning_bid.bid_amount }}</p>
+                    <p>Placed by: {{ winning_bid.user.username }}</p>
+                    <p>Placed on: {{ winning_bid.bid_time|date:"Y-m-d H:i" }}</p>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
+<!-- Modal for Placing Bid -->
+<div class="modal fade" id="placeBidModal" tabindex="-1" role="dialog" aria-labelledby="placeBidModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="placeBidModalLabel">Place Your Bid</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="height: 200px;">
+                <form method="post" action="{% url 'place_bid' commodity.id %}">
+                    {% csrf_token %}
+                    <div class="d-flex">
+                        <input type="text" class="form-control" style="border-radius: 5px 0 0 5px;"
+                            placeholder="Amount" id="bid_amount" name="bid_amount" required>
 
-<script>
-    // Function to update the countdown timer
-    function updateCountdown(endTime) {
-        const now = new Date().getTime();
-        const timeLeft = endTime - now;
+                        <button type="submit" class="btn btn-danger"
+                            style="border-radius: 0 5px 5px 0;">Bid</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-        if (timeLeft <= 0) {
-            // Auction has expired, display a message or take action accordingly
-            document.getElementById("countdown").innerHTML = "Auction has ended";
-        } else {
-            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-            // Display the countdown
-            document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    <script>
+        // Function to update the countdown timer
+        function updateCountdown(endTime) {
+            const now = new Date().getTime();
+            const timeLeft = endTime - now;
+    
+            if (timeLeft <= 0) {
+                // Auction has expired
+                document.getElementById("countdown").innerHTML = "Auction has ended";
+    
+                // Hide the Place Bid button
+                const placeBidButton = document.querySelector('[data-target="#placeBidModal"]');
+                if (placeBidButton) {
+                    placeBidButton.style.display = 'none';
+                }
+            } else {
+                // Update countdown
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+    
+                // Display the countdown
+                document.getElementById("days").textContent = `${days}d`;
+                document.getElementById("hours").textContent = `${hours}h`;
+                document.getElementById("minutes").textContent = `${minutes}m`;
+                document.getElementById("seconds").textContent = `${seconds}s`;
+            }
         }
-    }
-
-    // Replace 'bidding_session.end_time' with the actual end time in milliseconds (Unix timestamp)
-    const expiryTime = new Date('{{  bidding_session|date:"F d, Y H:i:s" }}000').getTime();
-
-    // Update the countdown every second
-    setInterval(function () {
-        updateCountdown(expiryTime);
-    }, 1000);
-</script>
+    
+        // Replace 'bidding_session.end_time' with the actual end time in milliseconds (Unix timestamp)
+        const expiryTime = new Date('{{  bidding_session|date:"F d, Y H:i:s" }}').getTime();
+    
+        // Update the countdown every second
+        setInterval(function () {
+            updateCountdown(expiryTime);
+        }, 1000);
+    
+        document.addEventListener("DOMContentLoaded", function () {
+            const smallImages = document.querySelectorAll(".small-image");
+            const largeImage = document.getElementById("large-image");
+    
+            smallImages.forEach(function (smallImage) {
+                smallImage.addEventListener("click", function () {
+                    const largeImageUrl = smallImage.getAttribute("data-large-image-url");
+                    largeImage.src = largeImageUrl;
+                });
+            });
+        });
+    </script>
+    
 
 {% endblock %}

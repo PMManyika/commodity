@@ -8,10 +8,12 @@
             Sign up to find the best deals on agricultural commodities
         </div>
         <div style="display: flex; align-items: center;">
-            <input type="email" name="email" class="form-control" style="width: 400px;  border-radius: 5px 0 0 5px;" placeholder="Enter your email" required>
+            <!-- Updated input field for mobile number -->
+            <input type="text" name="mobile_number" class="form-control" style="width: 400px; border-radius: 5px 0 0 5px;" placeholder="Enter your mobile number" required>
             <button type="submit" class="btn btn-info" style="border-radius: 0 5px 5px 0;">Submit</button>
         </div>
     </form>
+    {% if request.method == "POST" %}
     {% if messages %}
     <div class="col-8 btn-success alert alert-dismissible fade show">
         {% for message in messages %}
@@ -23,6 +25,7 @@
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
+    {% endif %}
     {% endif %}
 </div>
 {% endblock %}

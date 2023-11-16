@@ -1,0 +1,70 @@
+{% extends "commodity/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <h2>Your Won Bids</h2>
+    {% if won_commodities %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Commodity Name</th>
+                    <th>Winning Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for commodity in won_commodities %}
+                    <tr>
+                        <td>{{ commodity.name }}</td>
+                        <td>${{ commodity.current_price }}</td>
+                        <td>
+                            <a href="{% url 'commodity_detail' commodity.id %}">View</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Bootstrap Pagination -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if won_commodities.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ won_commodities.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo;</span>
+                    </li>
+                {% endif %}
+                
+                {% for num in won_commodities.paginator.page_range %}
+                    {% if won_commodities.number == num %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if won_commodities.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ won_commodities.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&raquo;</span>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% else %}
+        <p>You have not won any bids yet.</p>
+    {% endif %}
+</div>
+
+
+{% endblock %}

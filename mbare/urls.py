@@ -19,15 +19,16 @@ from django.contrib import admin
 from django.urls import path, include
 
 from commodity.views import list_commodities
+from libs.views import profile_dashboard
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("commodity.urls")),
     path("broker/", include("broker.urls")),
     path("accounts/", include("allauth.urls")),
-    path("accounts/profile/", list_commodities, name="list-commodities"),
     path("bidding/", include("bids.urls")),
     path("libs/", include("libs.urls")),
+    path("accounts/profile/", profile_dashboard, name="profile_dashboard"),
 ]
 
 if settings.DEBUG:
